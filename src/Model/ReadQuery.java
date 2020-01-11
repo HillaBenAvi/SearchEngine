@@ -3,19 +3,13 @@ package Model;
 import java.io.File;
 import java.util.ArrayList;
 
-public class ReadQuery {
-
-    private String path;
-
-    public ReadQuery (String path){
-        this.path= path;
-    }
+public class ReadQuery extends AReader {
 
     public ArrayList<Query> readQueriesFromFile (String path){
         ArrayList<Query> queries = new ArrayList<>();
         String text = "";
         try{
-            text = ReadFile.fileToString(path);
+            text = fileToString(path);
             queries = getQueriesFromText(text);
         }
         catch (Exception e){
@@ -28,8 +22,9 @@ public class ReadQuery {
     private ArrayList<Query> getQueriesFromText(String text) {
         ArrayList<Query> queries = new ArrayList<>();
 
-        String [] queriesTexts = text.split("<top>");
-        for(int i=1; i<queriesTexts.length; i++){
+        String [] queriesTexts = text.split("<top>"); //every cell in this array is a query
+
+        for(int i=1; i<queriesTexts.length; i++){ //split every query by the defined domains
             String [] removeTop = queriesTexts[i].split("</top>"); //remove </top>
             String [] removeNarr = removeTop[0].split("<narr>");
             String narr = removeNarr[1]; //after the narr tag
@@ -48,6 +43,10 @@ public class ReadQuery {
 
         }
         return queries;
+    }
+
+    public void setStopWordsPath (String stopWordsFilePath){
+        super.stopWordsFilePath = stopWordsFilePath;
     }
 
 

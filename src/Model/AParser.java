@@ -119,7 +119,7 @@ public abstract class AParser {
             else if(!isNumeric(words[i]) && words[i].contains(".")){
                 i++;
             }
-            else if (Character.isUpperCase(words[i].charAt(0)) && words[i].length()>1) {
+            else if (Character.isUpperCase(words[i].charAt(0)) && words[i].length()>1 ) {
                 term = words[i];
                 if( (term.contains("$")) || (term.contains("%"))) {
                     i++;
@@ -141,7 +141,7 @@ public abstract class AParser {
                     i++;
                     continue;
                 }
-                    addToDictionary(dictionary, term);
+                    addToDictionary(dictionary, term.toLowerCase());
                 i++;
             }
         }

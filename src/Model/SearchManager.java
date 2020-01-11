@@ -1,17 +1,22 @@
 package Model;
 
+import javafx.util.Pair;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 
 public class SearchManager {
 
     private Hashtable<String, Term> dictionary;
-    HashSet<DocumentData> documents;
-    String postingPath;
-    Searcher searcher;
+    private Hashtable<String, DocumentData> documents;
+    private String postingPath;
+    private Searcher searcher;
 
     public SearchManager(String postingPath){
         this.postingPath = postingPath;
@@ -46,7 +51,7 @@ public class SearchManager {
     }
 
     private void loadDocuments () {
-        documents =new HashSet<>();
+        documents =new Hashtable<>();
         try{
             String fileSeparator = System.getProperty("file.separator");
             String filePath =  postingPath + fileSeparator + "Documents.txt";
@@ -59,6 +64,7 @@ public class SearchManager {
                 docData.setLength(Integer.parseInt(splitLine[1]));
                 docData.setCommonWordName(splitLine[2]);
                 docData.setMostCommonWord(Integer.parseInt(splitLine[3]));
+                documents.put(docData.getDocID(), docData);
                 line = br.readLine();
             }
         }
@@ -71,9 +77,49 @@ public class SearchManager {
 
     //the function will receive the query/path to query file and call the searcher to find the relevant documents by
     //calling the searcher.
-    public void search (String query){
+    public Hashtable<String, List <Pair<String,Double>>> search (String query, boolean semanticModel) throws IOException {
 
+        String fileSeparator = System.getProperty("file.separator");
+        String stopWordsPath =  postingPath + fileSeparator + "StopWords.txt";
+
+        ArrayList<Query> queries = new ArrayList<>();
+        ReadQuery reader = new ReadQuery();
+        reader.setStopWordsPath(stopWordsPath);
+        HashSet<String> stopWords = reader.getStopWords();
+        if (query.contains("/")){ // query is a path to file
+
+            queries = reader.readQueriesFromFile(query);
+        }
+        else {
+            Query queryToAdd = new Query ("0" , query, "", "");
+            queries.add(queryToAdd);
+        }
+        Hashtable<String, List <Pair<String,Double>>> results = new Hashtable<>();
+        for (Query q : queries){
+            List <Pair<String,Double>> relevantDocuments = searcher.search(q , semanticModel, stopWords);
+            results.put(q.getQueryId(), relevantDocuments);
+        }
+
+        return results;
 
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

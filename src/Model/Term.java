@@ -59,4 +59,8 @@ public class Term {
     public int getLocationInPosting (){
         return locationInPosting;
     }
+
+    public double calculateIDF(int numOfDocs) {
+        return Math.log(numOfDocs/df)/Math.log(2.0);
+    }
 }

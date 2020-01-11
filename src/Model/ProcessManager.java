@@ -16,7 +16,7 @@ public class ProcessManager {
 
     public HashSet<DocumentData> documents;
 
-    static int BATCH_SIZE=1;
+    static int BATCH_SIZE=5000;
 
     public ProcessManager(String sourcePath, String postingPath, boolean stem){
         readFile = new ReadFile(sourcePath);
@@ -68,6 +68,7 @@ public class ProcessManager {
         indexer.indexing(dicAfterStemOrMerge);
         indexer.tempFilesToPostingFiles();
         indexer.createDocumentsAndDictionaryFiles(documents);
+        indexer.createStopWordsFile(stopWords);
 
     }
 

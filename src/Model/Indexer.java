@@ -108,7 +108,21 @@ public class Indexer {
                 for(int j=0; j<docsList.size(); j++){
                     appears = appears + docsList.get(j).getValue();
                 }
-                if (indexTable.containsKey(lowerCase)){
+                if (isDigit(splitedLine[0].charAt(0))){ // if a term starts with number- we insert it to the dictionary as it is.
+                    if(indexTable.containsKey(splitedLine[0])){
+                        indexTable.get(splitedLine[0]).addAll(docsList);
+                        dictionary.get(splitedLine[0]).addAppears(appears);
+                        dictionary.get(splitedLine[0]).addDf(docsList.size());
+                    }
+                    else{
+                        indexTable.put(splitedLine[0], docsList);
+                        Term term = new Term (splitedLine[0]);
+                        term.setDf(docsList.size());
+                        term.addAppears(appears);
+                        dictionary.put(splitedLine[0], term);
+                    }
+                }
+                else if (indexTable.containsKey(lowerCase)){
                     indexTable.get(lowerCase).addAll(docsList);
                     dictionary.get(lowerCase).addAppears(appears);
                     dictionary.get(lowerCase).addDf(docsList.size());
@@ -514,6 +528,18 @@ public class Indexer {
         sortedKeys.addAll(keys);
         sortedKeys.sort(new TermsComparator());
         return sortedKeys;
+    }
+
+    public void createStopWordsFile(HashSet<String> stopWords) throws IOException {
+        String fileSeparator = System.getProperty("file.separator");
+        String stopWordsFilePath =  path + fileSeparator + "StopWords.txt";
+        File stopWordsFile = new File(stopWordsFilePath);
+        boolean file = stopWordsFile.createNewFile();
+        FileWriter fileWriter = new FileWriter(stopWordsFile);
+        for(String word : stopWords){
+            fileWriter.write(word);
+        }
+        fileWriter.close();
     }
 
     class TermsComparator implements Comparator<String> {

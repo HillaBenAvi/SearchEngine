@@ -4,10 +4,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class ReadFile {
+public class ReadFile extends AReader {
 
     private String path;
-    private String stopWordsFilePath;
     private String corpusPath;
     private String [] corpusFilesPaths;
     private int lastFileRead;
@@ -20,7 +19,7 @@ public class ReadFile {
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
             if (file.isFile()){
-                this.stopWordsFilePath = file.getAbsolutePath();
+                super.stopWordsFilePath = file.getAbsolutePath();
             }
             if (file.isDirectory()){
                 this.corpusPath = file.getAbsolutePath();
@@ -58,33 +57,6 @@ public class ReadFile {
         return docsInFile;
     }
 
-    public HashSet<String> getStopWords() throws IOException {
-        HashSet<String> stopWords = new HashSet<>();
-        File file = new File(stopWordsFilePath);
-        FileReader fr = new FileReader(file);
-        BufferedReader br = new BufferedReader(fr);
-        String line = null;
-
-        while ( (line = br.readLine()) != null ){
-            stopWords.add(line);
-        }
-
-        return stopWords;
-    }
-
-    public static String fileToString (String filePath) throws IOException {
-        StringBuilder fileText = new StringBuilder(" ");
-        File file = new File(filePath);
-        FileReader fr = new FileReader(file);
-        BufferedReader br = new BufferedReader(fr);
-        String line = br.readLine();
-        while (line != null){
-            fileText.append(line + " ");
-            line = br.readLine();
-        }
-
-        return fileText.toString();
-    }
 
     private ArrayList<Document> getFileDocs (String fileText) {
         ArrayList<Document> fileDocs = new ArrayList<>();

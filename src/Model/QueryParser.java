@@ -22,7 +22,9 @@ public class QueryParser extends AParser {
         queryTerms = parseText(query.getTitle(), stopWords);
     }
 
-    public Hashtable<String, Integer> getQueryTerms() {
-        return queryTerms;
+    public ArrayList<String> getQueryTerms() {
+        ArrayList<String> queryTermsList = new ArrayList<>();
+        queryTermsList.addAll(queryTerms.keySet());
+        return queryTermsList;
     }
 }

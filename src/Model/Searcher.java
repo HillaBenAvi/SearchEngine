@@ -1,23 +1,24 @@
 package Model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
+import com.medallia.word2vec.Word2VecModel;
+import javafx.util.Pair;
+
+import javax.print.Doc;
+
 
 public class Searcher {
 
     private Ranker ranker;
     private String postingFilesPath;
     private Hashtable<String, Term> dictionary;
-    HashSet<DocumentData> documents;
+    Hashtable<String, DocumentData> documents;
 
-    public Searcher(Hashtable<String, Term> dictionary, HashSet<DocumentData> documents, String postingFilesPath) {
+    public Searcher(Hashtable<String, Term> dictionary, Hashtable<String,DocumentData> documents, String postingFilesPath) {
         this.dictionary = dictionary;
         this.ranker = new Ranker();
         this.postingFilesPath = postingFilesPath;
@@ -26,23 +27,35 @@ public class Searcher {
 
 
     // gets the query and return an arrayList of the relevant documents (after rank)
-    public ArrayList<String> search (Query query){
-        QueryParser queryParser = new QueryParser(query, null);
+    public List <Pair<String,Double>> search (Query query, boolean semanticModel, HashSet<String> stopWords){
+        QueryParser queryParser = new QueryParser(query, stopWords);
         queryParser.parse();
-        Hashtable<String, Integer> queryTerms = queryParser.getQueryTerms();
+        ArrayList<String> queryStrings = queryParser.getQueryTerms();
+        if (semanticModel){
+            queryStrings = expandQuery(queryStrings);
+        }
 
-        // open a set with the query terms
-        // add the semantic model here
+        // get all the relevant docs ordered by the terms
+        Hashtable<String,Hashtable<String,Integer>> allRelevantDocsOrderedByTerms = getRelevantDocuments(queryStrings);
 
-        //Daniel
-        Hashtable<String,Hashtable<String,Integer>> hashtableSendToRanker = new Hashtable<>();
-        hashtableSendToRanker = getRelevantDocuments(queryTerms.keySet()); //get the relevant docs of all the terms in the query
-        ranker.rank(hashtableSendToRanker); //send to the ranker for rank the docs
-        ArrayList<String> relevantDocs = ranker.getRankedDocuments(); // get the ranked docs.
+        //order all the relevant docs by documents
+        Hashtable<DocumentData, Hashtable<Term, Integer>> allRelevantDocsOrderedByDoc = termsListToDocsList (allRelevantDocsOrderedByTerms);
 
-        //continue...
+        double avgDocLength = calculateDocsAvqLenght();
 
-        return relevantDocs;
+        //send to the ranker for rank the docs, get the 50 most relevant.
+        List <Pair<String,Double>> relevantRankedDocs = ranker.rank(allRelevantDocsOrderedByDoc, documents.size(), avgDocLength);
+
+        return relevantRankedDocs;
+    }
+
+    private double calculateDocsAvqLenght() {
+        int totalLength = 0;
+        for (String doc: documents.keySet()) {
+            DocumentData docData = documents.get(doc);
+            totalLength = totalLength + docData.getLength();
+        }
+        return totalLength/documents.size();
     }
 
     //find the 5 most common entities of a document
@@ -57,7 +70,7 @@ public class Searcher {
      * @param queryTerms
      * @return list
      */
-    private  Hashtable<String,Hashtable<String,Integer>> getRelevantDocuments ( Set<String> queryTerms ){
+    private  Hashtable<String,Hashtable<String,Integer>> getRelevantDocuments ( ArrayList<String> queryTerms ){
         //listOfTerms- key: a term in the query,
         //             value: all the documents the term appears in, and number of appears in each one.
 
@@ -66,12 +79,10 @@ public class Searcher {
             Hashtable<String, Integer> termsWithNumOfAppearencesInEveryDoc = findRelevantDocsForTerm(term);
             listOfTerms.put(term, termsWithNumOfAppearencesInEveryDoc);
         }
-        // TODO: 1/2/2020 - a function that convert the listOfTerms to the Hashtable of docs (with terms in the doc) ;
 
         return listOfTerms;
     }
 
-    // TODO: 1/2/2020 add read file for the queries
 
 
     //check how can we get a sorted list of the same posting and find all the relevant docs of each term
@@ -142,21 +153,77 @@ public class Searcher {
     }
 
 
-    private Hashtable<String, Hashtable<String, Integer>> termsListToDocsList
+    private Hashtable<DocumentData, Hashtable<Term, Integer>> termsListToDocsList
             ( Hashtable<String,Hashtable<String,Integer>> terms){
-
-        Hashtable<String, Hashtable<String, Integer>> docs = new Hashtable<>();
+        // terms is the output hashtable of getRelevantDocuments
+        //hashTable of all the relevant docs. each doc has the terms from the query that appears in the doc.
+        Hashtable<DocumentData, Hashtable<Term, Integer>> docsList = new Hashtable<>();
 
         for (String term : terms.keySet()){
-
-
-
+            for (String docNo: terms.get(term).keySet()){ //all the documents the term appears in
+                DocumentData docData = documents.get(docNo);
+                Integer appears = terms.get(term).get(docNo);
+                if (!docsList.containsKey(docData)) {
+                    docsList.put(docData, new Hashtable<>());
+                }
+                if (dictionary.containsKey(term.toUpperCase())){
+                    docsList.get(docData).put(dictionary.get(term.toUpperCase()), appears);
+                }
+                else if (dictionary.containsKey(term.toLowerCase())){
+                    docsList.get(docData).put(dictionary.get(term.toLowerCase()), appears);
+                }
+                //if the dictionary doesn't contain the term, it will not be in the hashtable.
+            }
         }
-
-        return docs;
+        return docsList;
     }
 
 
+    //function that implements the semantic model.
+    //receive a list that contains the words in the query and return a list of the expanded query
+    private ArrayList<String> expandQuery (ArrayList<String> query){
+        ArrayList<String> toReturn=new ArrayList<>();
+        toReturn.addAll(query);
+        try {
+            for (int i = 0; i < query.size(); i++) {
+                Word2VecModel model = Word2VecModel.fromTextFile(new File( "d:\\documents\\users\\hillabe\\Downloads\\word2vec.c.output.model.txt"));
+                com.medallia.word2vec.Searcher searcher = model.forSearch();
+                int num = 3;
+                List<com.medallia.word2vec.Searcher.Match> matches = searcher.getMatches(query.get(i), num);
+                for (com.medallia.word2vec.Searcher.Match match : matches) {
+                    match.match();
+                }
+                for (int j = 1; j < matches.size(); j++) {
+                    String temp=matches.get(j).toString();
+                    String[] arr=temp.split("\\[");
+                    arr[1]=arr[1].substring(0,arr[1].length()-1);
+                    // if(Double.parseDouble(arr[1])>0.95)
+                    toReturn.add(arr[0]);
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return toReturn;
+
+    }
+
+    private Hashtable<String,Term> stringsToTerms (ArrayList<String> stringsList){
+        Hashtable<String, Term> termsList = new Hashtable<>();
+
+        for(String str : stringsList ){
+            if (dictionary.containsKey(str.toLowerCase())){
+                termsList.put(str.toLowerCase(), dictionary.get(str.toLowerCase()));
+            }
+            else if (dictionary.containsKey(str.toUpperCase())){
+                termsList.put(str.toUpperCase(), dictionary.get(str.toUpperCase()));
+            }
+            //if the word doesn't appear in the dictionary- it will not be calculated.
+        }
+
+        return termsList;
+    }
 
 
 }
