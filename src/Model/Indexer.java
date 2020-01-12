@@ -12,6 +12,7 @@ public class Indexer {
     private String path;
     private int batchNum;
     private boolean toStem;
+    private Hashtable<String, DocumentData> documents;
 
     public Indexer(String path, boolean toStem) {
         dictionary = new Hashtable<>();
@@ -20,7 +21,8 @@ public class Indexer {
         batchNum = 0;
     }
 
-    public void indexing(Hashtable <String, LinkedList<Pair<String, Integer>>> toIndex) throws IOException{
+    public void indexing(Hashtable <String, LinkedList<Pair<String, Integer>>> toIndex, boolean stem) throws IOException{
+        this.toStem = stem;
         createTempFiles();
         ArrayList<String> sortedKeys = getSortedKeys(toIndex.keySet());
         String input = sortedKeys.get(0);
@@ -84,13 +86,14 @@ public class Indexer {
         String currPostingFileName = getPostingFilePath(filesList[firstTempFile].getName());
 
         for (int i=firstTempFile ; i < filesList.length ; i++) { //iterate all the files in the index directory
-            if (filesList[i].getName().toLowerCase().contains("zevel") || filesList[i].getName().contains("Dictionary") || filesList[i].getName().contains("Documents") ){
+            if (filesList[i].getName().toLowerCase().contains("zevel")) {
                 filesList[i].delete();
                 continue;
             }
-            if (!isTempFile(filesList[i])){
+            if( filesList[i].getName().contains("Dictionary") || filesList[i].getName().contains("Documents") || !isTempFile(filesList[i])){
                 continue;
             }
+
             if (!getPostingFilePath(filesList[i].getName()).equals(currPostingFileName)){ // we need end this file and move to the next one
                 writeHashTableToText (indexTable, currPostingFileName);
                 currPostingFileName = getPostingFilePath(filesList[i].getName());
@@ -257,6 +260,8 @@ public class Indexer {
         return dictionary;
     }
 
+    public Hashtable<String, DocumentData> getDocuments () { return documents; }
+
     public void loadDictionaryFromFile () throws IOException {
         dictionary = new Hashtable<>();
         String fileSeparator = System.getProperty("file.separator");
@@ -278,6 +283,35 @@ public class Indexer {
         }
 
     }
+
+    public void loadDocumentsFromFile () {
+        documents =new Hashtable<>();
+        try{
+            String fileSeparator = System.getProperty("file.separator");
+            String filePath =  path + fileSeparator + "Documents.txt";
+            if (toStem){
+                filePath =  path + fileSeparator + "SDocuments.txt";
+            }
+            FileReader fr = new FileReader(new File(filePath));
+            BufferedReader br = new BufferedReader(fr);
+            String line = br.readLine();
+            while (line != null){
+                String [] splitLine = line.split(";");
+                DocumentData docData = new DocumentData (splitLine[0]);
+                docData.setLength(Integer.parseInt(splitLine[1]));
+                docData.setCommonWordName(splitLine[2]);
+                docData.setMostCommonWord(Integer.parseInt(splitLine[3]));
+                documents.put(docData.getDocID(), docData);
+                line = br.readLine();
+            }
+        }
+        catch(Exception e){
+            System.out.println("exception in loadDocuments- search manager");
+            e.printStackTrace();
+        }
+
+    }
+
 
     private void createPostingFiles() throws IOException {
         if (toStem){
@@ -538,6 +572,7 @@ public class Indexer {
         FileWriter fileWriter = new FileWriter(stopWordsFile);
         for(String word : stopWords){
             fileWriter.write(word);
+            fileWriter.write("\n");
         }
         fileWriter.close();
     }

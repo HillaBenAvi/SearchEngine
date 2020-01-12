@@ -44,7 +44,7 @@ public class Main extends Application{
         primaryStage.setWidth(650);
         primaryStage.setHeight(650);
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Parent root = fxmlLoader.load(getClass().getResource("SearchEngine.fxml").openStream());
+        Parent root = fxmlLoader.load(getClass().getResource("SearchEnginePartB.fxml").openStream());
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
         SetStageCloseEvent(primaryStage);

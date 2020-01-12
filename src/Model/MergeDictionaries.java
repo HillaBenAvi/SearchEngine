@@ -18,6 +18,9 @@ public class MergeDictionaries {
         if(termsInDoc.containsKey("")){
             termsInDoc.remove("");
         }
+        else if (termsInDoc.containsKey(" ")){
+            termsInDoc.remove(" ");
+        }
         for ( String term : termsInDoc.keySet()) {
             if (mergedDictionary.containsKey(term)) {
                 Pair<String, Integer> newPair = new Pair<>(docID, termsInDoc.get(term));

@@ -10,15 +10,20 @@ public abstract class AReader {
 
     protected String stopWordsFilePath;
 
-    public HashSet<String> getStopWords() throws IOException {
+    public HashSet<String> getStopWords(){
         HashSet<String> stopWords = new HashSet<>();
         File file = new File(stopWordsFilePath);
-        FileReader fr = new FileReader(file);
-        BufferedReader br = new BufferedReader(fr);
-        String line = null;
+        try{
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = null;
 
-        while ( (line = br.readLine()) != null ){
-            stopWords.add(line);
+            while ( (line = br.readLine()) != null ){
+                stopWords.add(line);
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
         }
 
         return stopWords;

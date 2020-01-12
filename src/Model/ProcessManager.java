@@ -16,7 +16,7 @@ public class ProcessManager {
 
     public HashSet<DocumentData> documents;
 
-    static int BATCH_SIZE=5000;
+    static int BATCH_SIZE=50000;
 
     public ProcessManager(String sourcePath, String postingPath, boolean stem){
         readFile = new ReadFile(sourcePath);
@@ -27,7 +27,8 @@ public class ProcessManager {
         toStem = stem;
     }
 
-    public void manage () throws IOException, ClassNotFoundException {
+    public void manage (boolean stem) throws IOException, ClassNotFoundException {
+        toStem = stem;
         ArrayList <Document> docsToParse = new ArrayList<>();
         ArrayList<Pair< String, Hashtable<String, Integer>>> docsAfterParsing;
         HashSet<String> stopWords = readFile.getStopWords();
@@ -45,7 +46,7 @@ public class ProcessManager {
                 else{
                     dicAfterStemOrMerge = mergeDictionaries.getMergedDictionary();
                 }
-                indexer.indexing(dicAfterStemOrMerge);
+                indexer.indexing(dicAfterStemOrMerge, toStem);
                 docsToParse = new ArrayList<>();
             }
             else {
@@ -65,11 +66,11 @@ public class ProcessManager {
             dicAfterStemOrMerge = mergeDictionaries.getMergedDictionary();
         }
 
-        indexer.indexing(dicAfterStemOrMerge);
+        indexer.indexing(dicAfterStemOrMerge, toStem);
         indexer.tempFilesToPostingFiles();
         indexer.createDocumentsAndDictionaryFiles(documents);
         indexer.createStopWordsFile(stopWords);
-
+        loadDictionaryFromFile ();
     }
 
 
@@ -104,6 +105,12 @@ public class ProcessManager {
         return indexer.getDictionary();
     }
 
+    public Hashtable<String, DocumentData> getDocuments (){
+        return indexer.getDocuments();
+    }
+
+
+
     public ArrayList <String> getDictionarySortedList (){
 
         return indexer.getSortedKeys(dictionary.keySet());
@@ -111,6 +118,7 @@ public class ProcessManager {
 
     public void loadDictionaryFromFile () throws IOException {
         indexer.loadDictionaryFromFile();
+        indexer.loadDocumentsFromFile();
     }
 
 

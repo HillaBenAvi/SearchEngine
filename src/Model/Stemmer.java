@@ -503,7 +503,6 @@ class Stemmer {
             }
 
         }
-        System.out.println("finished stem dictionary");
         return dictionaryAfterStemming;
     }
 }

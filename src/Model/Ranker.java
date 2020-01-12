@@ -13,7 +13,7 @@ public class Ranker {
 
     //this function gets all the terms of the query and the relevant docs for each term,
     // ranks the docs and returns the 50 most relevant docs.
-    public  List <Pair<String,Double>> rank(Hashtable<DocumentData, Hashtable<Term, Integer>> docsWithTheirTerms, int numOfDocs, double avgDocsLength) {
+    public  List <Pair<String,Double>> rank(Hashtable<DocumentData, Hashtable<Term, Pair<Integer, Boolean>>> docsWithTheirTerms, int numOfDocs, double avgDocsLength) {
         LinkedList <Pair<String,Double>> rankedDocs = new LinkedList<>();
         for ( DocumentData docData: docsWithTheirTerms.keySet()){
             double bm25 = BM25(docData, docsWithTheirTerms.get(docData), numOfDocs, avgDocsLength);
@@ -34,17 +34,26 @@ public class Ranker {
      * @param termsInDoc - hashtable with terms and number of appearences in the doc
      * @return the score of the document to the specific query
      **/
-    private double BM25 (DocumentData doc, Hashtable <Term , Integer> termsInDoc, int numOfDocs, double avgDocdLength){
+    private double BM25 (DocumentData doc, Hashtable <Term , Pair<Integer, Boolean>> termsInDoc, int numOfDocs, double avgDocdLength){
+
+        double titleValue = 0.8;
+        double descriptionValue = 0.6;
 
         ArrayList <Term> termsInDocList = new ArrayList<>();
         termsInDocList.addAll(termsInDoc.keySet());
-        double score =0;
-        double b =0.75, k1= 1.6;
+        double score = 0;
+        double b =0.5, k1= 1.6;
 
         for (Term term: termsInDocList ){
             double idf = term.calculateIDF(numOfDocs);
-            double termScore = idf * ( ((termsInDoc.get(term)*(k1+1))) / (termsInDoc.get(term) + k1 * (1 - b + ( b * (doc.getLength()/ avgDocdLength) ) ) ));
-            score = score + termScore;
+            double termScore = idf * ( ((termsInDoc.get(term).getKey()*(k1+1))) / (termsInDoc.get(term).getKey() + k1 * (1 - b + ( b * (doc.getLength()/ avgDocdLength) ) ) ));
+            if(termsInDoc.get(term).getValue()){ // the term is in the title of the query
+                score = score + (titleValue * termScore);
+            }
+            else{
+                score = score + (descriptionValue * termScore);
+            }
+
         }
 
         return score;

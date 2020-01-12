@@ -11,6 +11,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -24,11 +25,21 @@ public class SearchEngineController {
 
     private MyViewModel viewModel;
 
+    //Part A
     private String corpusPath;
     private String indexesPath;
     private boolean stem;
+    private boolean delete = false;
+
+    //Part B
+    private String resultsPath;
+    private String queriesFilePath;
+    private boolean semanticModel;
+    private boolean loaded = false;
+
 
     @FXML
+    //Part A
     public javafx.scene.control.Button startBtn;
     public javafx.scene.control.Button resetBtn;
     public javafx.scene.control.Button showDicBtn;
@@ -40,6 +51,15 @@ public class SearchEngineController {
     public javafx.scene.control.TextField corpusPathTF;
     public javafx.scene.control.TableView tableView;
 
+    //Part B
+    public javafx.scene.control.Button searchQueryBtn;
+    public javafx.scene.control.Button queriesFileBrowseBtn;
+    public javafx.scene.control.Button queriesFileSearchBtn;
+    public javafx.scene.control.Button resultsSaveBtn;
+    public javafx.scene.control.CheckBox semanticModelCB;
+    public javafx.scene.control.TextField queryTF;
+    public javafx.scene.control.TextField queriesFileTF;
+    public javafx.scene.control.TextField resultsPathTF;
 
 
     public void initCorpusPath (){
@@ -79,7 +99,9 @@ public class SearchEngineController {
         }
         else{
             this.viewModel = new MyViewModel(corpusPath, indexesPath,stem);
-            viewModel.startIndexing();
+            viewModel.startIndexing(stem);
+            delete = false;
+            loaded = true;
             showAlert("Indexing finished successfully!");
         }
     }
@@ -91,11 +113,17 @@ public class SearchEngineController {
     }
 
     public void deleteIndexFiles (){
+        if (delete == true){
+            showAlert("The posting directory is already empty.");
+            return;
+        }
         File directory = new File (indexesPath);
         File[] listOfFiles = directory.listFiles();
         for (File file : listOfFiles){
             file.delete();
         }
+        loaded = false;
+        delete = true;
     }
 
     public void loadDictionary () throws IOException {
@@ -105,14 +133,24 @@ public class SearchEngineController {
             if (corpusPath.isEmpty() || indexesPath.isEmpty() || corpusPath == null || indexesPath == null) {
                 showAlert("Please verify the corpus and index paths");
             } else {
+                if (delete || isEmptyDirectory(indexesPath)){
+                    showAlert("The posting folder is empty, please index the corpus before loading the dictionary.");
+                    return;
+                }
                 this.viewModel = new MyViewModel(corpusPath, indexesPath, stem);
                 viewModel.loadDictionary();
+                loaded = true;
                 showAlert("Dictionary loaded.");
             }
         }
         else
         {
+            if (delete  || isEmptyDirectory(indexesPath)){
+                showAlert("The posting folder is empty, please index the corpus before loading the dictionary.");
+                return;
+            }
             viewModel.loadDictionary();
+            loaded = true;
             showAlert("Dictionary loaded.");
         }
     }
@@ -177,8 +215,78 @@ public class SearchEngineController {
         public Record (String term, Integer df){
             this.count = new SimpleIntegerProperty(df);
             this.term = new SimpleStringProperty(term);
-
         }
+    }
+
+    public void initResultsPath (){
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        Stage loadStage = new Stage();
+        File f =directoryChooser.showDialog(loadStage);
+        if (f != null){
+            resultsPath = f.getAbsolutePath();
+            resultsPathTF.setText(resultsPath);
+        }
+    }
+
+    public void initQueriesFilePath (){
+        FileChooser fileChooser = new FileChooser();
+        Stage loadStage = new Stage();
+        fileChooser.getExtensionFilters();
+        File f = fileChooser.showOpenDialog(loadStage);
+        if (f != null){
+            queriesFilePath = f.getAbsolutePath();
+            queriesFileTF.setText(queriesFilePath);
+        }
+    }
+
+    public void setSemanticModelVal(){
+        if(semanticModel ==true){
+            semanticModel = false;
+        }
+        else{
+            semanticModel = true;
+        }
+    }
+
+    public void searchQuery (){
+        if (!loaded){
+            showAlert("Please load the dictionary before searching.");
+            return;
+        }
+        if(resultsPathTF.getText().isEmpty()) {
+            showAlert("Please enter path to the results file.");
+            return;
+        }
+        viewModel.search(queryTF.getText(), false, semanticModel, indexesPath , resultsPathTF.getText(), stem);
+        showAlert("Searching Finishd Successfully!");
+    }
+
+    public void searchQueriesFromFile(){
+        if (!loaded){
+            showAlert("Please load the dictionary before searching.");
+            return;
+        }
+        if(resultsPathTF.getText().isEmpty()) {
+            showAlert("Please enter path to the results file.");
+            return;
+        }
+        viewModel.search(queriesFilePath, true, semanticModel, indexesPath, resultsPathTF.getText(), stem);
+        showAlert("Searching Finishd Successfully!");
+    }
+
+    private boolean isEmptyDirectory (String path) {
+
+        File file = new File(path);
+
+        if (file.isDirectory()) {
+            if (file.list().length > 0) {
+                return false;
+            }
+            else {
+               return true;
+            }
+        }
+        return true;
     }
 
 

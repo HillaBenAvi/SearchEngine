@@ -154,7 +154,7 @@ public abstract class AParser {
     private String [] splitText (String text){
         StringBuilder word = new StringBuilder();
         List<String> wordsList = new LinkedList<>();
-        for (int i=0 ; i<text.length()-1 ; i++){
+        for (int i=0 ; i < text.length() ; i++){
             if (text.charAt(i) == ' ' || text.charAt(i) == '?' || text.charAt(i) == '*' || text.charAt(i) == ')' || text.charAt(i) == '('
                     || text.charAt(i) == '!' || text.charAt(i) == '/' || text.charAt(i) == ';' || text.charAt(i) == '\'' || text.charAt(i) == '_' ||
                     text.charAt(i) == '\"' || (text.charAt(i) == '-' && text.charAt(i+1) == '-' )){
@@ -166,7 +166,7 @@ public abstract class AParser {
             }
 
         }
-
+        wordsList.add(word.toString());
         String [] wordsArray = new String [wordsList.size()];
         wordsArray = wordsList.toArray(wordsArray);
         return wordsArray;
@@ -463,7 +463,7 @@ public abstract class AParser {
                 term = term.substring(0 , index) + term.substring(index) + "M";
             }
         }
-        else if (number >= 1000000000){
+        else if (number >= 1000000000 && number <= Float.MAX_VALUE ){
             number = number / 1000000000;
             term = "" + number;
             int index = term.indexOf('.');
@@ -494,10 +494,10 @@ public abstract class AParser {
                 }
             }
             if (!Character.isDigit(c) && !(c == '.')) {
-                containsChar = true;
+                return false;
             }
         }
-        return containsDigits && !containsChar;
+        return containsDigits;
     }
 
     private boolean isInteger(String word){
