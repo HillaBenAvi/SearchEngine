@@ -29,7 +29,7 @@ public abstract class AReader {
         return stopWords;
     }
 
-    public static String fileToString (String filePath) throws IOException {
+    public String fileToString (String filePath) throws IOException {
         StringBuilder fileText = new StringBuilder(" ");
         File file = new File(filePath);
         FileReader fr = new FileReader(file);

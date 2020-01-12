@@ -2,6 +2,8 @@ package Model;
 
 import javafx.util.Pair;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
@@ -505,4 +507,18 @@ class Stemmer {
         }
         return dictionaryAfterStemming;
     }
+
+    public ArrayList<String> stemQuery (ArrayList<String> queryBeforeStemming){
+        HashSet<String> afterStemming = new HashSet<>();
+        for (String word: queryBeforeStemming){
+            String stemTerm = myStem(word);
+            if(!afterStemming.contains(stemTerm)){
+                afterStemming.add(stemTerm);
+            }
+        }
+        ArrayList<String> afterStemmingList = new ArrayList<>();
+        afterStemmingList.addAll(afterStemming);
+        return afterStemmingList;
+    }
+
 }

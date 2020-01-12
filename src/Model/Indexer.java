@@ -13,12 +13,14 @@ public class Indexer {
     private int batchNum;
     private boolean toStem;
     private Hashtable<String, DocumentData> documents;
+    private  Hashtable <String, LinkedList< Pair <String,Integer>>> entities; //key: term, value: pair- key: docNo, value- appears
 
     public Indexer(String path, boolean toStem) {
         dictionary = new Hashtable<>();
         this.path = path;
         this.toStem = toStem;
         batchNum = 0;
+        entities = new Hashtable<>();
     }
 
     public void indexing(Hashtable <String, LinkedList<Pair<String, Integer>>> toIndex, boolean stem) throws IOException{
@@ -194,17 +196,19 @@ public class Indexer {
                     else{
                         fileWriter.write(term + ";");
                         for (Pair<String, Integer> pair : table.get(term)) {
-                            fileWriter.write("<" + pair.getKey() + "," + pair.getValue() + ">;");
+                            fileWriter.write("" + pair.getKey() + "," + pair.getValue() + ";");
                         }
                         fileWriter.write("\n");
                         if (!isTempFile(file)){
                             dictionary.get(term).setLocationInPosting(lineInPosting);
                             lineInPosting++;
                         }
+                        if (isUpperCase(term.charAt(0))){
+                            entities.put(term, table.get(term));
+                        }
                     }
                 }
                 fileWriter.close();
-
     }
 
     public void createDocumentsAndDictionaryFiles (HashSet<DocumentData> documents) throws IOException {
@@ -238,6 +242,25 @@ public class Indexer {
             fileWriterDoc.write("\n");
         }
         fileWriterDoc.close();
+    }
+
+    public void createEntitiesPostingFile () throws IOException {
+        String fileSeparator = System.getProperty("file.separator");
+        String filePath =  path + fileSeparator + "Entities.txt";
+        if (toStem){
+            filePath =  path + fileSeparator + "SEntities.txt";
+        }
+        File file = new File(filePath);
+        boolean newFile = file.createNewFile();
+        FileWriter fileWriter = new FileWriter(file);
+        for (String term : entities.keySet()){
+            fileWriter.write(term + ";");
+            for (Pair<String, Integer> pair : entities.get(term)) {
+                fileWriter.write("" + pair.getKey() + "," + pair.getValue() + ";");
+            }
+            fileWriter.write("\n");
+        }
+        fileWriter.close();
     }
 
     private boolean belongToSameTempFile(String term1, String term2){
@@ -281,6 +304,7 @@ public class Indexer {
             dictionary.put(splittedLine[0], term);
             line = br.readLine();
         }
+        fr.close();
 
     }
 
@@ -311,7 +335,6 @@ public class Indexer {
         }
 
     }
-
 
     private void createPostingFiles() throws IOException {
         if (toStem){
@@ -590,6 +613,7 @@ public class Indexer {
             return 0;
         }
     }
+
 
 }
 
