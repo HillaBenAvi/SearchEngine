@@ -13,6 +13,7 @@ public class SearchManager {
     private String postingPath;
     private Searcher searcher;
 
+
     public SearchManager(String postingPath, Hashtable<String, Term> dictionary,  Hashtable<String, DocumentData> documents ){
         this.postingPath = postingPath;
         this.dictionary = dictionary;
@@ -30,9 +31,7 @@ public class SearchManager {
         String fileSeparator = System.getProperty("file.separator");
         String stopWordsPath =  postingPath + fileSeparator + "StopWords.txt";
         reader.setStopWordsPath(stopWordsPath);
-
         ArrayList<Query> queries = new ArrayList<>();
-
         HashSet<String> stopWords = reader.getStopWords();
         if (isFile){ // query is a path to file
             queries = reader.readQueriesFromFile(query);
@@ -47,7 +46,7 @@ public class SearchManager {
             List <Pair<String,Double>> relevantDocuments = searcher.search(q , semanticModel, stopWords, stem);
             results.put(q.getQueryId(), relevantDocuments);
         }
-
+        searcher.createEntities(stem);
         saveResults (results, resultsPath);
 
     }
@@ -75,8 +74,6 @@ public class SearchManager {
         catch( IOException e ){
             e.printStackTrace();
         }
-
-
     }
 
 

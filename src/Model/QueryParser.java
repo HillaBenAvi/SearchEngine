@@ -20,8 +20,13 @@ public class QueryParser extends AParser {
 
     @Override
     public void parse() {
-        queryTitleTerms = parseText(query.getTitle().toLowerCase(), stopWords);
-        queryDescriptionTerms = parseText(query.getDescription().toLowerCase(), stopWords);
+        Hashtable<String, Integer> queryTitleTermsLower = parseText(query.getTitle().toLowerCase(), stopWords);
+        queryTitleTerms = parseText(query.getTitle(), stopWords);
+        queryTitleTerms.putAll(queryTitleTermsLower);
+
+        Hashtable<String, Integer> queryDescriptionTermsLower = parseText(query.getTitle().toLowerCase(), stopWords);
+        queryDescriptionTerms = parseText(query.getDescription(), stopWords);
+        queryDescriptionTerms.putAll(queryDescriptionTermsLower);
     }
 
     //return pair of two lists- the first is the terms in the title and the second is the terms in the description

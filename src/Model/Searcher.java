@@ -1,6 +1,8 @@
 package Model;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -8,6 +10,7 @@ import java.util.stream.Stream;
 import com.medallia.word2vec.Word2VecModel;
 import javafx.util.Pair;
 
+import static java.lang.Character.isUpperCase;
 
 
 public class Searcher {
@@ -16,12 +19,14 @@ public class Searcher {
     private String postingFilesPath;
     private Hashtable<String, Term> dictionary;
     private Hashtable<String, DocumentData> documents;
+    private Hashtable<String, ArrayList<Pair<String,Integer>>> entitiesOrderByDoc; //key: document no, value: list of the entities in the document and number of appearences
 
     public Searcher(Hashtable<String, Term> dictionary, Hashtable<String,DocumentData> documents, String postingFilesPath) {
         this.dictionary = dictionary;
         this.ranker = new Ranker();
         this.postingFilesPath = postingFilesPath;
         this.documents = documents;
+        entitiesOrderByDoc = new Hashtable<>();
     }
 
 
@@ -30,6 +35,13 @@ public class Searcher {
         QueryParser queryParser = new QueryParser(query, stopWords);
         queryParser.parse();
         Pair<ArrayList<String>, ArrayList<String>> queryStrings = queryParser.getQueryTerms();
+
+        if(stem){
+            Stemmer stemmer = new Stemmer();
+            ArrayList<String> stemTitle = stemmer.stemQuery(queryStrings.getKey());
+            ArrayList<String> stemDesc = stemmer.stemQuery(queryStrings.getValue());
+            queryStrings = new Pair (stemTitle, stemDesc);
+        }
 
         if (semanticModel){
             ArrayList<String> expandedTitle = expandQuery(queryStrings.getKey());
@@ -117,8 +129,8 @@ public class Searcher {
             String [] separatedLine = line.split(";");
             for(int i=1; i<separatedLine.length; i++){
                 String [] doc = separatedLine[i].split(",");
-                String docNo = doc[0].substring(1);
-                String appears = doc[1].substring(0,doc[1].length()-1);
+                String docNo = doc[0];
+                String appears = doc[1];
                 documents.put(docNo, new Pair (Integer.parseInt(appears), isInTitle));
             }
         }
@@ -229,19 +241,24 @@ public class Searcher {
         toReturn.addAll(query);
         try {
             for (int i = 0; i < query.size(); i++) {
-                Word2VecModel model = Word2VecModel.fromTextFile(new File( "d:\\documents\\users\\hillabe\\Downloads\\word2vec.c.output.model.txt"));
+                Word2VecModel model = Word2VecModel.fromTextFile(new File( "C:\\Users\\hillabe\\IdeaProjects\\SearchEngine\\word2vec.c.output.model.txt"));
                 com.medallia.word2vec.Searcher searcher = model.forSearch();
                 int num = 3;
-                List<com.medallia.word2vec.Searcher.Match> matches = searcher.getMatches(query.get(i), num);
-                for (com.medallia.word2vec.Searcher.Match match : matches) {
-                    match.match();
+                try{
+                    List<com.medallia.word2vec.Searcher.Match> matches = searcher.getMatches(query.get(i), num);
+                    for (com.medallia.word2vec.Searcher.Match match : matches) {
+                        match.match();
+                    }
+                    for (int j = 1; j < matches.size(); j++) {
+                        String temp=matches.get(j).toString();
+                        String[] arr=temp.split("\\[");
+                        arr[1]=arr[1].substring(0,arr[1].length()-1);
+                        // if(Double.parseDouble(arr[1])>0.95)
+                        toReturn.add(arr[0]);
+                    }
                 }
-                for (int j = 1; j < matches.size(); j++) {
-                    String temp=matches.get(j).toString();
-                    String[] arr=temp.split("\\[");
-                    arr[1]=arr[1].substring(0,arr[1].length()-1);
-                    // if(Double.parseDouble(arr[1])>0.95)
-                    toReturn.add(arr[0]);
+                catch(com.medallia.word2vec.Searcher.UnknownWordException e){
+                    continue;
                 }
             }
         }
@@ -252,21 +269,55 @@ public class Searcher {
 
     }
 
-    private Hashtable<String,Term> stringsToTerms (ArrayList<String> stringsList){
-        Hashtable<String, Term> termsList = new Hashtable<>();
 
-        for(String str : stringsList ){
-            if (dictionary.containsKey(str.toLowerCase())){
-                termsList.put(str.toLowerCase(), dictionary.get(str.toLowerCase()));
+    public void createEntities(boolean stem) {
+        entitiesOrderByDoc = new Hashtable<>();
+        String fileSeparator = System.getProperty("file.separator");
+        String entitiesPath =  postingFilesPath + fileSeparator + "Entities.txt";
+        if(stem){
+            entitiesPath =  postingFilesPath + fileSeparator + "SEntities.txt";
+        }
+        try {
+            FileReader reader = new FileReader(new File(entitiesPath));
+            BufferedReader bf = new BufferedReader(reader);
+            String line = bf.readLine();
+            while (line != null) {
+                String[] separatedLine = line.split(";");
+                for (int j = 1; j < separatedLine.length; j++) {
+                    String[] doc = separatedLine[j].split(",");
+                    String docNo = doc[0];
+                    String appears = doc[1];
+                    if (!entitiesOrderByDoc.containsKey(docNo)) {
+                        entitiesOrderByDoc.put(docNo, new ArrayList<>());
+                    }
+                    entitiesOrderByDoc.get(docNo).add(new Pair(separatedLine[0], Integer.parseInt(appears)));
+                }
+                line = bf.readLine();
             }
-            else if (dictionary.containsKey(str.toUpperCase())){
-                termsList.put(str.toUpperCase(), dictionary.get(str.toUpperCase()));
-            }
-            //if the word doesn't appear in the dictionary- it will not be calculated.
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return termsList;
+
     }
 
+    public List <Pair<String, Double>> getTopEntities (String docNo){
+
+        ArrayList <Pair <String, Double>> rankedEntities = new ArrayList<>();
+        DocumentData docData = documents.get(docNo);
+        ArrayList<Pair<String,Integer>> entities = entitiesOrderByDoc.get(docNo);
+        for (Pair entity: entities){
+            double tf = ((int) entity.getValue()) / docData.getLength();
+            double idf = dictionary.get(entity.getKey()).calculateIDF(documents.size());
+            double score = tf * idf;
+            rankedEntities.add(new Pair(entity.getKey(), score));
+        }
+
+        rankedEntities.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        int returnListSize = Math.min(5, rankedEntities.size());
+
+        return rankedEntities.subList(0, returnListSize);
+    }
 
 }

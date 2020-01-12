@@ -9,6 +9,12 @@ public abstract class AParser {
 
     public abstract void parse ();
 
+    /**
+     * the method gets a text presented by string and parse it to terms
+     * @param text - the text we need to parse
+     * @param stopWords- list of the stop words that will be ignored
+     * @return hash table. The keys are the terms that appears in the text. The value of every key is the number of appears of every term in the text.
+     */
     protected Hashtable<String, Integer> parseText (String text, HashSet<String> stopWords){
         Hashtable<String, Integer> dictionary = new Hashtable<>();
         Hashtable<String, Integer> upperCasesDic = new Hashtable<>();
@@ -119,7 +125,7 @@ public abstract class AParser {
             else if(!isNumeric(words[i]) && words[i].contains(".")){
                 i++;
             }
-            else if (Character.isUpperCase(words[i].charAt(0)) && words[i].length()>1 ) {
+            else if (Character.isUpperCase(words[i].charAt(0)) && words[i].length()>1 && !stopWords.contains(words[i].toLowerCase())) {
                 term = words[i];
                 if( (term.contains("$")) || (term.contains("%"))) {
                     i++;
@@ -129,10 +135,13 @@ public abstract class AParser {
                 while (i < words.length && !words[i].equals("") && Character.isUpperCase(words[i].charAt(0))
                         && !StringUtils.containsAny(words[i], "?;|*&<>+{}=()�¥\\"))  {
                     term = term + " " + words[i];
-                    addToDictionary(upperCasesDic, term);
+                  //  addToDictionary(upperCasesDic, term);
                     i++;
                 }
-                addToDictionary(upperCasesDic, term);
+                if (!stopWords.contains(term.toLowerCase())){
+                    addToDictionary(upperCasesDic, term);
+                }
+
             }
 
             else {
@@ -151,6 +160,11 @@ public abstract class AParser {
 
     }
 
+    /**
+     * the method splits the text to raw terms that will be parsed.
+     * @param text
+     * @return
+     */
     private String [] splitText (String text){
         StringBuilder word = new StringBuilder();
         List<String> wordsList = new LinkedList<>();

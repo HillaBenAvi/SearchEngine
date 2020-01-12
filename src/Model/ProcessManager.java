@@ -70,6 +70,7 @@ public class ProcessManager {
         indexer.tempFilesToPostingFiles();
         indexer.createDocumentsAndDictionaryFiles(documents);
         indexer.createStopWordsFile(stopWords);
+        indexer.createEntitiesPostingFile();
         loadDictionaryFromFile ();
     }
 
@@ -108,8 +109,6 @@ public class ProcessManager {
     public Hashtable<String, DocumentData> getDocuments (){
         return indexer.getDocuments();
     }
-
-
 
     public ArrayList <String> getDictionarySortedList (){
 
