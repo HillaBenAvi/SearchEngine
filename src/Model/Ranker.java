@@ -65,7 +65,6 @@ public class Ranker {
             else{
                 score = score + (descriptionValue * termScore);
             }
-
         }
 
         return score;
