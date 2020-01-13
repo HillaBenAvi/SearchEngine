@@ -14,6 +14,11 @@ public class MergeDictionaries {
         mergedDictionary = new Hashtable<>();
     }
 
+    /**
+     * add all the terms in specific doc to the mergeDictionary
+     * @param docID - documents id
+     * @param termsInDoc - terms in the documents with docId
+     */
     public void merge (String docID, Hashtable <String, Integer> termsInDoc) {
         if(termsInDoc.containsKey("")){
             termsInDoc.remove("");

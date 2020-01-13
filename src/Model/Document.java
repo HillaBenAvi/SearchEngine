@@ -8,7 +8,6 @@ public class Document {
     private String text;
 
     public Document() {
-
         docNo = "";
         publishDate = "";
         title = "";

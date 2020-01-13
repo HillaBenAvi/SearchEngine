@@ -27,6 +27,12 @@ public class ProcessManager {
         toStem = stem;
     }
 
+    /**
+     * mange the indexes process
+     * @param stem - if the process includes the stemming process
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void manage (boolean stem) throws IOException, ClassNotFoundException {
         toStem = stem;
         ArrayList <Document> docsToParse = new ArrayList<>();
@@ -75,7 +81,10 @@ public class ProcessManager {
     }
 
 
-
+    /**
+     * add documents to the list of all documents
+     * @param docsToAdd - documents to add
+     */
     private void addDocuments (ArrayList<Pair< String, Hashtable<String, Integer>>> docsToAdd){
         mergeDictionaries = new MergeDictionaries();
         for ( Pair<String, Hashtable<String, Integer>> pair: docsToAdd) {
@@ -115,6 +124,10 @@ public class ProcessManager {
         return indexer.getSortedKeys(dictionary.keySet());
     }
 
+    /**
+     * load dictionary from posting files
+     * @throws IOException
+     */
     public void loadDictionaryFromFile () throws IOException {
         indexer.loadDictionaryFromFile();
         indexer.loadDocumentsFromFile();
