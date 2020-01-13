@@ -64,7 +64,10 @@ public class Searcher {
     }
 
 
-
+    /**
+     * calculate the average of the length of all documents
+     * @return average of the length of all documents.
+     */
     private double calculateDocsAvqLength() {
         int totalLength = 0;
         for (String doc: documents.keySet()) {
@@ -74,17 +77,12 @@ public class Searcher {
         return totalLength/documents.size();
     }
 
-    //find the 5 most common entities of a document
-    public ArrayList<String> entitiesRecognize (String docId){
 
-        return null;
-    }
-
-    //I took this function from the Ranker class
     /**
-     * get the list of terms in the query
-     * @param
-     * @return list
+     * @param queryTitleTerms - list of terms in the query
+     * @param queryDescriptionTerms - list of terms in the description of the query
+     * @param stem - if it was stemming on the corpus
+     * @return a list of terms in the query and their relevant documents with number of apperences of each term in each document.
      */
     private  Hashtable<String,Hashtable<String, Pair<Integer, Boolean >>> getRelevantDocuments ( ArrayList<String> queryTitleTerms,  ArrayList<String> queryDescriptionTerms, boolean stem ){
         //listOfTerms- key: a term in the query,
@@ -112,8 +110,8 @@ public class Searcher {
 
 
 
-    //check how can we get a sorted list of the same posting and find all the relevant docs of each term
-    /**
+
+    /** finds all the relevant documents for the term
      * @param term from the query
      * @return all the documents the term appears in.
      */
@@ -143,6 +141,12 @@ public class Searcher {
 
     }
 
+    /**
+     *
+     * @param term - a word
+     * @param stem - if the corpus stemmed
+     * @return path for the posting file that the word appears in
+     */
     private String findPostingPathForTerm (String term, boolean stem){
         String fileSeparator = System.getProperty("file.separator");
         String filePath = postingFilesPath + fileSeparator;
@@ -207,9 +211,12 @@ public class Searcher {
         return null;
     }
 
-
-    private Hashtable<DocumentData, Hashtable<Term, Pair<Integer, Boolean >>> termsListToDocsList
-            ( Hashtable<String,Hashtable<String,Pair<Integer, Boolean >>> terms){
+    /**
+     * this function converts the data structure from terms with their documents to documents with their terms
+     * @param terms - data structure that contains all the terms with their documents for each term.
+     * @return data structure that contains all the documents with their term for each document.
+     */
+    private Hashtable<DocumentData, Hashtable<Term, Pair<Integer, Boolean >>> termsListToDocsList ( Hashtable<String,Hashtable<String,Pair<Integer, Boolean >>> terms){
         // terms is the output hashtable of getRelevantDocuments
         //hashTable of all the relevant docs. each doc has the terms from the query that appears in the doc.
         Hashtable<DocumentData, Hashtable<Term, Pair<Integer, Boolean >>> docsList = new Hashtable<>();
@@ -234,8 +241,11 @@ public class Searcher {
     }
 
 
-    //function that implements the semantic model.
-    //receive a list that contains the words in the query and return a list of the expanded query
+    /**
+     * function that implements the semantic model.
+     * @param query - list of term of the query
+     * @return receive a list that contains the words in the query and return a list of the expanded query
+     */
     private ArrayList<String> expandQuery (ArrayList<String> query){
         ArrayList<String> toReturn=new ArrayList<>();
         toReturn.addAll(query);
@@ -270,6 +280,10 @@ public class Searcher {
     }
 
 
+    /**
+     * create the list of entities from the posting file
+     * @param stem - if the posting file saved with S in the beginning of the name
+     */
     public void createEntities(boolean stem) {
         entitiesOrderByDoc = new Hashtable<>();
         String fileSeparator = System.getProperty("file.separator");
@@ -302,6 +316,11 @@ public class Searcher {
 
     }
 
+    /**
+     * this function ranks the entities of a document
+     * @param docNo - id of the document
+     * @return list of top entities of the document
+     */
     public List <Pair<String, Double>> getTopEntities (String docNo){
 
         ArrayList <Pair <String, Double>> rankedEntities = new ArrayList<>();
