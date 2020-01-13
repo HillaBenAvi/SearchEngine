@@ -13,8 +13,8 @@
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="659.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.SearchEngineController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="552.6666259765625" minWidth="10.0" prefWidth="521.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="138.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="552.6666259765625" minWidth="10.0" prefWidth="527.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="132.0" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints maxHeight="223.0" minHeight="0.0" prefHeight="96.0" vgrow="SOMETIMES" />
@@ -162,21 +162,21 @@
       </Button>
       <ComboBox fx:id="queryComboBox" onAction="#fillDocsComboBox" onContextMenuRequested="#fillDocsComboBox" prefWidth="150.0" GridPane.rowIndex="1">
          <GridPane.margin>
-            <Insets left="115.0" top="380.0" />
+            <Insets left="125.0" top="380.0" />
          </GridPane.margin></ComboBox>
       <ComboBox fx:id="docsComboBox" prefWidth="150.0" GridPane.rowIndex="1">
          <GridPane.margin>
-            <Insets left="345.0" top="380.0" />
+            <Insets left="350.0" top="380.0" />
          </GridPane.margin>
       </ComboBox>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Queries:" GridPane.rowIndex="1">
          <GridPane.margin>
-            <Insets left="70.0" top="380.0" />
+            <Insets left="80.0" top="380.0" />
          </GridPane.margin>
       </Text>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Documents:" GridPane.rowIndex="1">
          <GridPane.margin>
-            <Insets left="280.0" top="380.0" />
+            <Insets left="285.0" top="380.0" />
          </GridPane.margin>
       </Text>
       <Button fx:id="showEntitiesBtn" mnemonicParsing="false" onAction="#showEntities" text="Get Entities" GridPane.columnIndex="1" GridPane.rowIndex="1">

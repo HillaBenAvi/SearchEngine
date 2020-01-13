@@ -55,5 +55,8 @@ public class MyViewModel {
 
     }
 
+    public int getDocsNum (){
+        return processManager.getDocuments().size();
+    }
 
 }

@@ -105,6 +105,8 @@ public class SearchEngineController {
     }
 
     public void startIndexing () throws IOException, ClassNotFoundException {
+
+        long startTimeIndex = System.nanoTime();
         corpusPath = corpusPathTF.getText();
         indexesPath = indexesPathTF.getText();
         if (corpusPath.isEmpty() || indexesPath.isEmpty() || corpusPath == null || indexesPath == null){
@@ -115,8 +117,13 @@ public class SearchEngineController {
             viewModel.startIndexing(stem);
             delete = false;
             loaded = true;
-            showAlert("Indexing finished successfully!");
+            long finishTimeIndex = System.nanoTime();
+            showAlert("Indexing finished successfully!\n" +
+                    "Total time for parsing and indexing: " + ((finishTimeIndex - startTimeIndex) / 1000000000.0) + " \n"
+                     + "Number of indexed documents:  " + viewModel.getDocsNum() +"\n"
+                     + "Number of words in the dictionary: " + viewModel.getDictionary().size() );
         }
+
     }
 
     private void showAlert(String alertMessage) {
@@ -266,6 +273,10 @@ public class SearchEngineController {
             showAlert("Please load the dictionary before searching.");
             return;
         }
+        if(queryTF.getText()==null || queryTF.getText()==""){
+            showAlert("Please enter query.");
+            return;
+        }
         viewModel.search(queryTF.getText(), false, semanticModel, indexesPath , resultsPathTF.getText(), stem);
         showAlert("Searching Finishd Successfully!");
     }
@@ -273,6 +284,14 @@ public class SearchEngineController {
     public void searchQueriesFromFile(){
         if (!loaded){
             showAlert("Please load the dictionary before searching.");
+            return;
+        }
+        if(queryTF.getText()==null || queryTF.getText() == ""){
+            showAlert("Please enter query.");
+            return;
+        }
+        if(queriesFileTF.getText()== null || queriesFileTF.getText() == ""){
+            showAlert("Please enter queries file path.");
             return;
         }
         viewModel.search(queriesFilePath, true, semanticModel, indexesPath, resultsPathTF.getText(), stem);
