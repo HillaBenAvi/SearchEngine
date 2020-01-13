@@ -143,7 +143,7 @@ public class SearchEngineController {
         if (viewModel == null) {
             corpusPath = corpusPathTF.getText();
             indexesPath = indexesPathTF.getText();
-            if (corpusPath.isEmpty() || indexesPath.isEmpty() || corpusPath == null || indexesPath == null) {
+            if ( indexesPath.isEmpty()  || indexesPath == null) {
                 showAlert("Please verify the corpus and index paths");
             } else {
                 if (delete || isEmptyDirectory(indexesPath)){

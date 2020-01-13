@@ -13,18 +13,19 @@ public class ProcessManager {
     private Indexer indexer;
     private Hashtable<String, Term> dictionary;
     private boolean toStem;
+    private String sourcePath;
 
     public HashSet<DocumentData> documents;
 
     static int BATCH_SIZE=50000;
 
     public ProcessManager(String sourcePath, String postingPath, boolean stem){
-        readFile = new ReadFile(sourcePath);
         mergeDictionaries = new MergeDictionaries();
         stemmer = new Stemmer();
         indexer = new Indexer(postingPath, stem);
         documents = new HashSet<>();
         toStem = stem;
+        this.sourcePath = sourcePath;
     }
 
     /**
@@ -34,6 +35,7 @@ public class ProcessManager {
      * @throws ClassNotFoundException
      */
     public void manage (boolean stem) throws IOException, ClassNotFoundException {
+        readFile = new ReadFile(sourcePath);
         toStem = stem;
         ArrayList <Document> docsToParse = new ArrayList<>();
         ArrayList<Pair< String, Hashtable<String, Integer>>> docsAfterParsing;
