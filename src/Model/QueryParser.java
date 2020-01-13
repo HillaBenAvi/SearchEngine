@@ -19,6 +19,9 @@ public class QueryParser extends AParser {
     }
 
     @Override
+    /**
+     * parse query
+     */
     public void parse() {
         Hashtable<String, Integer> queryTitleTermsLower = parseText(query.getTitle().toLowerCase(), stopWords);
         queryTitleTerms = parseText(query.getTitle(), stopWords);
@@ -29,7 +32,9 @@ public class QueryParser extends AParser {
         queryDescriptionTerms.putAll(queryDescriptionTermsLower);
     }
 
-    //return pair of two lists- the first is the terms in the title and the second is the terms in the description
+    /**
+     * @return pair of two lists- the first is the terms in the title and the second is the terms in the description
+     */
     public Pair<ArrayList<String>,ArrayList<String>> getQueryTerms() {
         ArrayList<String> titleTermsList = new ArrayList<>();
         titleTermsList.addAll(queryTitleTerms.keySet());

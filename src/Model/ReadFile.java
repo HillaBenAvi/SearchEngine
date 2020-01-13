@@ -11,7 +11,6 @@ public class ReadFile extends AReader {
     private String [] corpusFilesPaths;
     private int lastFileRead;
 
-
     public ReadFile(String pathToDirectory) {
         path = pathToDirectory;
         lastFileRead = 0;
@@ -37,6 +36,10 @@ public class ReadFile extends AReader {
 
     }
 
+    /**
+     *
+     * @return number of files in the corpus
+     */
     public int filesNum (){
         return corpusFilesPaths.length;
     }
@@ -68,6 +71,11 @@ public class ReadFile extends AReader {
         return fileDocs;
     }
 
+    /**
+     * convert string to document object with data
+     * @param docString - text of document
+     * @return document object
+     */
     private Document stringToDocument (String docString){
         Document doc = new Document();
         String [] openDocNo = docString.split("<DOCNO>"); // remove <DOCNO> tag

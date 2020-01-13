@@ -23,6 +23,12 @@ public class Indexer {
         entities = new Hashtable<>();
     }
 
+    /**
+     * this function indexes the documents, add all the terms to the dictionary and write the temporary posting files
+     * @param toIndex - dictionary to indexes
+     * @param stem - if the process includes the stemming process
+     * @throws IOException
+     */
     public void indexing(Hashtable <String, LinkedList<Pair<String, Integer>>> toIndex, boolean stem) throws IOException{
         this.toStem = stem;
         createTempFiles();
@@ -74,6 +80,11 @@ public class Indexer {
         return docsList;
     }
 
+    /**
+     * merge the temporary posting files to posting files
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void tempFilesToPostingFiles () throws IOException, ClassNotFoundException {
         createPostingFiles();
         File folder = new File(path);
@@ -168,6 +179,11 @@ public class Indexer {
 
     }
 
+    /**
+     * check if file is a temp posting file
+     * @param file
+     * @return true if the file is a temporary file
+     */
     private boolean isTempFile (File file){
         String fileName = file.getName();
         if (toStem){ // all files start with 'S'
@@ -184,6 +200,14 @@ public class Indexer {
     }
 
     // gets hashtable of terms and list of documents it appears
+
+    /**
+     * write data to text in file
+     * @param table - data to write
+     * @param path - path to write the data
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private void writeHashTableToText (Hashtable <String, LinkedList < Pair < String, Integer >>> table, String path) throws IOException, ClassNotFoundException {
                 File file = new File(path);
                 FileWriter fileWriter = new FileWriter(file);
@@ -211,6 +235,11 @@ public class Indexer {
                 fileWriter.close();
     }
 
+    /**
+     * creates the posting files of documents and dictionary
+     * @param documents - list of documents
+     * @throws IOException
+     */
     public void createDocumentsAndDictionaryFiles (HashSet<DocumentData> documents) throws IOException {
 
         String fileSeparator = System.getProperty("file.separator");
@@ -244,6 +273,10 @@ public class Indexer {
         fileWriterDoc.close();
     }
 
+    /**
+     * creates the posting file of entities
+     * @throws IOException
+     */
     public void createEntitiesPostingFile () throws IOException {
         String fileSeparator = System.getProperty("file.separator");
         String filePath =  path + fileSeparator + "Entities.txt";
@@ -263,6 +296,7 @@ public class Indexer {
         fileWriter.close();
     }
 
+
     private boolean belongToSameTempFile(String term1, String term2){
         if (getTempFilePath(term1).equals(getTempFilePath(term2))){
             return true;
@@ -270,6 +304,11 @@ public class Indexer {
         return false;
     }
 
+    /**
+     * create a file in disk
+     * @param fileName
+     * @throws IOException
+     */
     private void createFile(String fileName) throws IOException {
         String fileSeparator = System.getProperty("file.separator");
         boolean newFile;
@@ -285,6 +324,10 @@ public class Indexer {
 
     public Hashtable<String, DocumentData> getDocuments () { return documents; }
 
+    /**
+     * load dictionary from posting file
+     * @throws IOException
+     */
     public void loadDictionaryFromFile () throws IOException {
         dictionary = new Hashtable<>();
         String fileSeparator = System.getProperty("file.separator");
@@ -308,6 +351,9 @@ public class Indexer {
 
     }
 
+    /**
+     * load documents from posting file
+     */
     public void loadDocumentsFromFile () {
         documents =new Hashtable<>();
         try{
@@ -336,6 +382,10 @@ public class Indexer {
 
     }
 
+    /**
+     * create the posting files
+     * @throws IOException
+     */
     private void createPostingFiles() throws IOException {
         if (toStem){
             String fileName = "SNUMBERS.txt";

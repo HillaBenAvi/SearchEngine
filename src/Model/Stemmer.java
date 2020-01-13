@@ -493,6 +493,11 @@ class Stemmer {
         return termAfterStermming;
     }
 
+    /**
+     * stemming on dictionary
+     * @param dictionary
+     * @return dictionary with the terms after stemming
+     */
     public Hashtable<String, LinkedList<Pair<String, Integer>>> stemDictionary(Hashtable <String, LinkedList<Pair<String, Integer>>> dictionary){
         Hashtable <String, LinkedList<Pair<String, Integer>>> dictionaryAfterStemming = new Hashtable<>();
         for(String key: dictionary.keySet()){
@@ -508,6 +513,11 @@ class Stemmer {
         return dictionaryAfterStemming;
     }
 
+    /**
+     * stemming on a query
+     * @param queryBeforeStemming
+     * @return list of terms after stemming
+     */
     public ArrayList<String> stemQuery (ArrayList<String> queryBeforeStemming){
         HashSet<String> afterStemming = new HashSet<>();
         for (String word: queryBeforeStemming){
