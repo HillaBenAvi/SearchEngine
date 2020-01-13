@@ -308,7 +308,7 @@ public class Searcher {
         DocumentData docData = documents.get(docNo);
         ArrayList<Pair<String,Integer>> entities = entitiesOrderByDoc.get(docNo);
         for (Pair entity: entities){
-            double tf = ((int) entity.getValue()) / docData.getLength();
+            double tf = ((int) entity.getValue()) / (double)docData.getLength();
             double idf = dictionary.get(entity.getKey()).calculateIDF(documents.size());
             double score = tf * idf;
             rankedEntities.add(new Pair(entity.getKey(), score));
