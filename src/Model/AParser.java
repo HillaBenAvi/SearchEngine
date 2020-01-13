@@ -203,6 +203,11 @@ public abstract class AParser {
         }
     }
 
+    /**
+     * add term to the dictionary
+     * @param dic - dictionary to add the term
+     * @param term - add this term to the dictionary
+     */
     private void addToDictionary(Hashtable<String, Integer> dic, String term) {
         if (dic.containsKey(term)) {
             dic.put(term, dic.get(term) + 1);
@@ -211,6 +216,11 @@ public abstract class AParser {
         }
     }
 
+    /**
+     * check if the word1  is a price
+     * @param word1 - word
+     * @return true if the word is price, otherwise false
+     */
     private boolean isPrice(String word1) {
         if (word1.charAt(0) == '$' )
             if(isNumeric(word1.substring(1)) || isNumericRange(word1.substring(1)) || word1.contains("-")) {
@@ -219,6 +229,12 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     * check if the words are a price
+     * @param word1 - word
+     * @param word2 - word
+     * @return true if the words are price, otherwise false
+     */
     private boolean isPrice(String word1, String word2) {
         if (word2.equals("million") || word2.equals("billion") || word2.equals("trillion")
                 || word2.equals("m") || word2.equals("M") || word2.equals("bn") || word2.equals("BN")) {
@@ -239,6 +255,13 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     * check if the words are a price
+     * @param word1 - word
+     * @param word2 - word
+     * @param word3 - word
+     * @return true if the words are price, otherwise false
+     */
     private boolean isPrice(String word1, String word2, String word3) {
         if (word3.equals("Dollars") || word3.equals("dollars")) {
             if (isFraction(word2) || word2.equals("million") || word2.equals("billion") || word2.equals("trillion")
@@ -251,6 +274,14 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     * check if the words are a price
+     * @param word1 - word
+     * @param word2 - word
+     * @param word3 - word
+     * @param word4 - word
+     * @return  true if the words are price, otherwise false
+     */
     private boolean isPrice(String word1, String word2, String word3, String word4) {
         if (word4.equals("Dollars") || word4.equals("dollars")) {
             if (word3.equals("U.S.")) {
@@ -264,6 +295,11 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     * convert word to uniform pattern of price
+     * @param word1 - word
+     * @return word after converted
+     */
     private String convertToPrice(String word1) {
         String term = word1.substring(1);
         if(isNumericRange(term)){
@@ -284,6 +320,12 @@ public abstract class AParser {
         return term;
     }
 
+    /**
+     * convert words to uniform pattern of price
+     * @param word1 - word
+     * @param word2 - word
+     * @return word after converted
+     */
     private String convertToPrice(String word1, String word2) {
         String term="";
         if(word1.charAt(0) == '$'){
@@ -324,6 +366,13 @@ public abstract class AParser {
         return term;
     }
 
+    /**
+     * convert words to uniform pattern of price
+     * @param word1 - word
+     * @param word2 - word
+     * @param word3 - word
+     * @return word after converted
+     */
     private String convertToPrice(String word1, String word2, String word3){
         String term ="";
         if(word1.charAt(0) == '$'){
@@ -341,6 +390,14 @@ public abstract class AParser {
         return term;
     }
 
+    /**
+     * convert words to uniform pattern of price
+     * @param word1 - word
+     * @param word2 - word
+     * @param word3 - word
+     * @param word4 - word
+     * @return word after converted
+     */
     private String convertToPrice(String word1, String word2, String word3, String word4) {
         String term = "";
         double price = Double.parseDouble(word1);
@@ -354,6 +411,11 @@ public abstract class AParser {
         return term;
     }
 
+    /**
+     * check if the word is a percent
+     * @param word1 - word
+     * @return true if the word is percent, otherwise false
+     */
     private boolean isPercent(String word1) {
         if (word1.charAt(word1.length() - 1) == '%') {
             return true;
@@ -361,6 +423,12 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     * check if the words are percent
+     * @param word1 - word
+     * @param word2 - word
+     * @return true if the words are percent, otherwise false
+     */
     private boolean isPercent(String word1, String word2) {
         if ((word2.equals("percent") || word2.equals("percentage")) && (isNumeric(word1) || isNumericRange(word1))) {
             return true;
@@ -368,6 +436,12 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     * convert words to uniform pattern of percent
+     * @param word1 - word
+     * @param word2 - word
+     * @return true if the words are percent, otherwise false
+     */
     private String convertToPercent(String word1, String word2) {
         String term = "";
         if (isNumeric(word1) || isNumericRange(word1)) {
@@ -376,6 +450,12 @@ public abstract class AParser {
         return term;
     }
 
+    /**
+     * check if the words are distance
+     * @param word1 - word
+     * @param word2 - word
+     * @return true if the words are distance, otherwise false
+     */
     private boolean isDistance (String word1, String word2) {
         if ((word2.equals("kilometers") || word2.equals("Kilometers") ||word2.equals("km") || word2.equals("KM") ||
                 word2.equals("cm") || word2.equals("CM")|| word2.equals("meters") || word2.equals("Meters")) && (isNumeric(word1))) {
@@ -384,6 +464,12 @@ public abstract class AParser {
         return false;
     }
 
+    /**
+     *
+     * @param word1
+     * @param word2
+     * @return
+     */
     private String convertToDistance (String word1, String word2) {
         String term = "";
         if (word2.equals("meters") || word2.equals("Meters")){

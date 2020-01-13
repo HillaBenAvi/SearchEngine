@@ -13,21 +13,29 @@ public class ProcessManager {
     private Indexer indexer;
     private Hashtable<String, Term> dictionary;
     private boolean toStem;
+    private String sourcePath;
 
     public HashSet<DocumentData> documents;
 
     static int BATCH_SIZE=50000;
 
     public ProcessManager(String sourcePath, String postingPath, boolean stem){
-        readFile = new ReadFile(sourcePath);
         mergeDictionaries = new MergeDictionaries();
         stemmer = new Stemmer();
         indexer = new Indexer(postingPath, stem);
         documents = new HashSet<>();
         toStem = stem;
+        this.sourcePath = sourcePath;
     }
 
+    /**
+     * mange the indexes process
+     * @param stem - if the process includes the stemming process
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void manage (boolean stem) throws IOException, ClassNotFoundException {
+        readFile = new ReadFile(sourcePath);
         toStem = stem;
         ArrayList <Document> docsToParse = new ArrayList<>();
         ArrayList<Pair< String, Hashtable<String, Integer>>> docsAfterParsing;
@@ -75,7 +83,10 @@ public class ProcessManager {
     }
 
 
-
+    /**
+     * add documents to the list of all documents
+     * @param docsToAdd - documents to add
+     */
     private void addDocuments (ArrayList<Pair< String, Hashtable<String, Integer>>> docsToAdd){
         mergeDictionaries = new MergeDictionaries();
         for ( Pair<String, Hashtable<String, Integer>> pair: docsToAdd) {
@@ -115,6 +126,10 @@ public class ProcessManager {
         return indexer.getSortedKeys(dictionary.keySet());
     }
 
+    /**
+     * load dictionary from posting files
+     * @throws IOException
+     */
     public void loadDictionaryFromFile () throws IOException {
         indexer.loadDictionaryFromFile();
         indexer.loadDocumentsFromFile();

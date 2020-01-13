@@ -60,6 +60,11 @@ public class Term {
         return locationInPosting;
     }
 
+    /**
+     * calculate the idf of a term
+     * @param numOfDocs - number of documents in the corpus
+     * @return idf of the term
+     */
     public double calculateIDF(int numOfDocs) {
         return Math.log(numOfDocs/df)/Math.log(2.0);
     }

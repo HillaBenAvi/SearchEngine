@@ -23,6 +23,9 @@ public class DocsParser extends AParser {
     }
 
     @Override
+    /**
+     * parse documents
+     */
     public void parse() {
         listParsedDoc = new ArrayList<>();
         for(Document doc : docsToParse) {
@@ -49,6 +52,10 @@ public class DocsParser extends AParser {
         }
     }
 
+    /**
+     *
+     * @return the list of parsed documents
+     */
     public ArrayList<Pair<String, Hashtable<String, Integer>>> getListParsedDoc() {
         return listParsedDoc;
     }

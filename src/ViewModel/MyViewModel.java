@@ -3,10 +3,12 @@ package ViewModel;
 import Model.ProcessManager;
 import Model.Term;
 import Model.SearchManager;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 public class MyViewModel {
 
@@ -40,5 +42,21 @@ public class MyViewModel {
         searchManager.search(query, isFile, semanticModel, resultsPath, stem);
     }
 
+    public void saveResults (String resultsPath){
+        searchManager.saveResults(resultsPath);
+    }
+
+    public Hashtable<String, List<Pair<String,Double>>> getResults (){
+        return searchManager.getResults();
+    }
+
+    public List <Pair<String, Double>> getTopEntities (String docNo){
+        return searchManager.getTopEntities(docNo);
+
+    }
+
+    public int getDocsNum (){
+        return processManager.getDocuments().size();
+    }
 
 }

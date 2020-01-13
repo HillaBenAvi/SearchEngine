@@ -10,6 +10,10 @@ public abstract class AReader {
 
     protected String stopWordsFilePath;
 
+    /**
+     * read stop words from the corpus
+     * @return hashSet of stop words
+     */
     public HashSet<String> getStopWords(){
         HashSet<String> stopWords = new HashSet<>();
         File file = new File(stopWordsFilePath);
@@ -29,6 +33,12 @@ public abstract class AReader {
         return stopWords;
     }
 
+    /**
+     * read file
+     * @param filePath - path to the file
+     * @return string of the text
+     * @throws IOException
+     */
     public String fileToString (String filePath) throws IOException {
         StringBuilder fileText = new StringBuilder(" ");
         File file = new File(filePath);

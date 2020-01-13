@@ -12,13 +12,14 @@ public class SearchManager {
     private Hashtable<String, DocumentData> documents;
     private String postingPath;
     private Searcher searcher;
-
+    private Hashtable<String, List<Pair<String, Double>>> results;
 
     public SearchManager(String postingPath, Hashtable<String, Term> dictionary,  Hashtable<String, DocumentData> documents ){
         this.postingPath = postingPath;
         this.dictionary = dictionary;
         this.documents = documents;
-        searcher = new Searcher(dictionary, documents, postingPath);
+        this.searcher = new Searcher(dictionary, documents, postingPath);
+        this.results = new Hashtable<>();
     }
 
 
@@ -47,11 +48,11 @@ public class SearchManager {
             results.put(q.getQueryId(), relevantDocuments);
         }
         searcher.createEntities(stem);
-        saveResults (results, resultsPath);
+        this.results = results;
 
     }
 
-    private void saveResults(Hashtable<String, List<Pair<String, Double>>> results, String resultsPath) {
+    public void saveResults(String resultsPath) {
         try{
             String fileSeparator = System.getProperty("file.separator");
             String stopWordsFilePath =  resultsPath + fileSeparator + "results.txt";
@@ -60,7 +61,7 @@ public class SearchManager {
             FileWriter fileWriter = new FileWriter(resultsFile);
 
             LinkedList<String> sortedQueries = new LinkedList<>();
-            sortedQueries.addAll( results.keySet());
+            sortedQueries.addAll(results.keySet());
             sortedQueries.sort((o1, o2) -> o1.compareTo(o2));
 
             for (String query: sortedQueries){
@@ -76,6 +77,13 @@ public class SearchManager {
         }
     }
 
+    public Hashtable<String, List <Pair<String,Double>>> getResults (){
+        return results;
+    }
+
+    public List <Pair<String, Double>> getTopEntities (String docNo){
+        return searcher.getTopEntities(docNo);
+    }
 
 
 }

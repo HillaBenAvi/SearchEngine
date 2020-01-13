@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class ReadQuery extends AReader {
-
+    /**
+     * read queries from file of queries
+     * @param path - path of the file with all the queries
+     * @return list of queries
+     */
     public ArrayList<Query> readQueriesFromFile (String path){
         ArrayList<Query> queries = new ArrayList<>();
         String text = "";
@@ -18,6 +22,7 @@ public class ReadQuery extends AReader {
 
         return queries;
     }
+
 
     private ArrayList<Query> getQueriesFromText(String text) {
         ArrayList<Query> queries = new ArrayList<>();
