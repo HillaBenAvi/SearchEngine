@@ -50,7 +50,7 @@ public class MyViewModel {
         return searchManager.getResults();
     }
 
-    public List <Pair<String, Double>> getTopEntities (String docNo){
+    public List <Pair<String, Double>> getTopEntities (String docNo, boolean stem){
         return searchManager.getTopEntities(docNo);
 
     }

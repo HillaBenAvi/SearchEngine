@@ -346,7 +346,6 @@ public class SearchEngineController {
             Stage resultsStage = new Stage();
             resultsStage.setTitle("Results");
             FXMLLoader fxmlLoader = new FXMLLoader();
-           // Parent root = fxmlLoader.load(getClass().getResource("Results.fxml").openStream());
             Scene scene = new Scene(queriesTableView, 363, 497);
             resultsStage.setScene(scene);
             resultsStage.show();
@@ -432,13 +431,13 @@ public class SearchEngineController {
     public void showEntities () {
         String doc = docsComboBox.getSelectionModel().getSelectedItem().toString();
         if(doc!= null && doc!=""){
-            List<Pair<String, Double>> topEntites = viewModel.getTopEntities(doc);
-            showAlert("The top entities are: \n" +
-                    topEntites.get(0).getKey() + " rank: " + topEntites.get(0).getValue() + " \n" +
-                    topEntites.get(1).getKey() + " rank: " + topEntites.get(1).getValue() + " \n" +
-                    topEntites.get(2).getKey() + " rank: " + topEntites.get(2).getValue() + " \n" +
-                    topEntites.get(3).getKey() + " rank: " + topEntites.get(3).getValue() + " \n" +
-                    topEntites.get(4).getKey() + " rank: " + topEntites.get(4).getValue() + " \n" );
+            List<Pair<String, Double>> topEntites = viewModel.getTopEntities(doc, stem);
+            int numOfEntities = Math.min(5, topEntites.size());
+            String alert = "The top entities are: \n";
+            for (int i=0; i<numOfEntities; i++ ){
+                alert = alert + topEntites.get(i).getKey() + " rank: " + topEntites.get(0).getValue() + " \n";
+            }
+            showAlert(alert );
         }
 
 
