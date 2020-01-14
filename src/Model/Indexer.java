@@ -328,11 +328,11 @@ public class Indexer {
      * load dictionary from posting file
      * @throws IOException
      */
-    public void loadDictionaryFromFile () throws IOException {
+    public void loadDictionaryFromFile (boolean stem) throws IOException {
         dictionary = new Hashtable<>();
         String fileSeparator = System.getProperty("file.separator");
         String filePath =  path + fileSeparator + "Dictionary.txt";
-        if (toStem){
+        if (stem){
             filePath =  path + fileSeparator + "SDictionary.txt";
         }
         FileReader fr = new FileReader(new File(filePath));
@@ -354,12 +354,12 @@ public class Indexer {
     /**
      * load documents from posting file
      */
-    public void loadDocumentsFromFile () {
+    public void loadDocumentsFromFile (boolean stem) {
         documents =new Hashtable<>();
         try{
             String fileSeparator = System.getProperty("file.separator");
             String filePath =  path + fileSeparator + "Documents.txt";
-            if (toStem){
+            if (stem){
                 filePath =  path + fileSeparator + "SDocuments.txt";
             }
             FileReader fr = new FileReader(new File(filePath));

@@ -33,8 +33,8 @@ public class MyViewModel {
         return processManager.getDictionarySortedList();
     }
 
-    public void loadDictionary () throws IOException {
-        processManager.loadDictionaryFromFile();
+    public void loadDictionary (boolean stem) throws IOException {
+        processManager.loadDictionaryFromFile(stem);
     }
 
     public void search (String query, boolean isFile, boolean semanticModel, String indexesPath, String resultsPath, boolean stem){

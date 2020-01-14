@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -158,7 +157,7 @@ public class SearchEngineController {
                     return;
                 }
                 this.viewModel = new MyViewModel(corpusPath, indexesPath, stem);
-                viewModel.loadDictionary();
+                viewModel.loadDictionary(stem);
                 loaded = true;
                 showAlert("Dictionary loaded.");
             }
@@ -169,7 +168,7 @@ public class SearchEngineController {
                 showAlert("The posting folder is empty, please index the corpus before loading the dictionary.");
                 return;
             }
-            viewModel.loadDictionary();
+            viewModel.loadDictionary(stem);
             loaded = true;
             showAlert("Dictionary loaded.");
         }
@@ -278,7 +277,8 @@ public class SearchEngineController {
             return;
         }
         viewModel.search(queryTF.getText(), false, semanticModel, indexesPath , resultsPathTF.getText(), stem);
-        showAlert("Searching Finishd Successfully!");
+        fillQueryComboBox(new ArrayList<String>(viewModel.getResults().keySet()));
+        openResultsStage(viewModel.getResults());
     }
 
     public void searchQueriesFromFile(){
@@ -295,7 +295,6 @@ public class SearchEngineController {
             return;
         }
         viewModel.search(queriesFilePath, true, semanticModel, indexesPath, resultsPathTF.getText(), stem);
-        Hashtable<String, List<Pair<String, Double>>> temoresults = viewModel.getResults();
         fillQueryComboBox(new ArrayList<String>(viewModel.getResults().keySet()));
         openResultsStage(viewModel.getResults());
     }
