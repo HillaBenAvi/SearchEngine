@@ -33,8 +33,8 @@ public class MyViewModel {
         return processManager.getDictionarySortedList();
     }
 
-    public void loadDictionary () throws IOException {
-        processManager.loadDictionaryFromFile();
+    public void loadDictionary (boolean stem) throws IOException {
+        processManager.loadDictionaryFromFile(stem);
     }
 
     public void search (String query, boolean isFile, boolean semanticModel, String indexesPath, String resultsPath, boolean stem){
@@ -50,7 +50,7 @@ public class MyViewModel {
         return searchManager.getResults();
     }
 
-    public List <Pair<String, Double>> getTopEntities (String docNo){
+    public List <Pair<String, Double>> getTopEntities (String docNo, boolean stem){
         return searchManager.getTopEntities(docNo);
 
     }

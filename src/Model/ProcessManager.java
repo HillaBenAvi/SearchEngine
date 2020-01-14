@@ -79,7 +79,7 @@ public class ProcessManager {
         indexer.createDocumentsAndDictionaryFiles(documents);
         indexer.createStopWordsFile(stopWords);
         indexer.createEntitiesPostingFile();
-        loadDictionaryFromFile ();
+        loadDictionaryFromFile (stem);
     }
 
 
@@ -130,9 +130,9 @@ public class ProcessManager {
      * load dictionary from posting files
      * @throws IOException
      */
-    public void loadDictionaryFromFile () throws IOException {
-        indexer.loadDictionaryFromFile();
-        indexer.loadDocumentsFromFile();
+    public void loadDictionaryFromFile (boolean stem) throws IOException {
+        indexer.loadDictionaryFromFile(stem);
+        indexer.loadDocumentsFromFile(stem);
     }
 
 

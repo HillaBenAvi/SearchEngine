@@ -7,7 +7,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -158,7 +157,7 @@ public class SearchEngineController {
                     return;
                 }
                 this.viewModel = new MyViewModel(corpusPath, indexesPath, stem);
-                viewModel.loadDictionary();
+                viewModel.loadDictionary(stem);
                 loaded = true;
                 showAlert("Dictionary loaded.");
             }
@@ -169,7 +168,7 @@ public class SearchEngineController {
                 showAlert("The posting folder is empty, please index the corpus before loading the dictionary.");
                 return;
             }
-            viewModel.loadDictionary();
+            viewModel.loadDictionary(stem);
             loaded = true;
             showAlert("Dictionary loaded.");
         }
@@ -183,13 +182,13 @@ public class SearchEngineController {
         tableView = new TableView();
         TableColumn <String, Record> column1 = new TableColumn<>("TERM");
         TableColumn <String, Record> column2 = new TableColumn<>("COUNT");
-        column1.setCellValueFactory(new PropertyValueFactory<>("query"));
-        column2.setCellValueFactory(new PropertyValueFactory<>("numOfDocs"));
+        column1.setCellValueFactory(new PropertyValueFactory<>("term"));
+        column2.setCellValueFactory(new PropertyValueFactory<>("count"));
         tableView .getColumns().add(column1);
         tableView .getColumns().add(column2);
 
-        tableView .setEditable(true);
-        tableView .getSelectionModel().setCellSelectionEnabled(true);
+        tableView.setEditable(true);
+        tableView.getSelectionModel().setCellSelectionEnabled(true);
 
         for (String term : keys){
             tableView .getItems().add(new Record (term, dictionary.get(term).getAppears()));
@@ -278,7 +277,8 @@ public class SearchEngineController {
             return;
         }
         viewModel.search(queryTF.getText(), false, semanticModel, indexesPath , resultsPathTF.getText(), stem);
-        showAlert("Searching Finishd Successfully!");
+        fillQueryComboBox(new ArrayList<String>(viewModel.getResults().keySet()));
+        openResultsStage(viewModel.getResults());
     }
 
     public void searchQueriesFromFile(){
@@ -295,7 +295,6 @@ public class SearchEngineController {
             return;
         }
         viewModel.search(queriesFilePath, true, semanticModel, indexesPath, resultsPathTF.getText(), stem);
-        Hashtable<String, List<Pair<String, Double>>> temoresults = viewModel.getResults();
         fillQueryComboBox(new ArrayList<String>(viewModel.getResults().keySet()));
         openResultsStage(viewModel.getResults());
     }
@@ -346,7 +345,6 @@ public class SearchEngineController {
             Stage resultsStage = new Stage();
             resultsStage.setTitle("Results");
             FXMLLoader fxmlLoader = new FXMLLoader();
-           // Parent root = fxmlLoader.load(getClass().getResource("Results.fxml").openStream());
             Scene scene = new Scene(queriesTableView, 363, 497);
             resultsStage.setScene(scene);
             resultsStage.show();
@@ -411,7 +409,7 @@ public class SearchEngineController {
     }
 
     public void fillQueryComboBox ( ArrayList<String> queries ){
-
+        queryComboBox.getItems().clear();
         for (String query : queries){
             queryComboBox.getItems().add(query);
         }
@@ -420,26 +418,39 @@ public class SearchEngineController {
 
     public void fillDocsComboBox () {
         Hashtable<String, List<Pair<String, Double>>> results = viewModel.getResults();
-        String query = queryComboBox.getSelectionModel().getSelectedItem().toString();
-        docsComboBox.getItems().clear();
-        if (query != null && query != "") {
-            for (Pair<String, Double> p : results.get(query)) {
-                docsComboBox.getItems().add(p.getKey());
+        if(results.size()==0){
+            return;
+        }
+        try {
+            String query = queryComboBox.getSelectionModel().getSelectedItem().toString();
+            docsComboBox.getItems().clear();
+            if (query != null && query != "") {
+                for (Pair<String, Double> p : results.get(query)) {
+                    docsComboBox.getItems().add(p.getKey());
+                }
             }
         }
+        catch(Exception e){ }
     }
 
     public void showEntities () {
-        String doc = docsComboBox.getSelectionModel().getSelectedItem().toString();
-        if(doc!= null && doc!=""){
-            List<Pair<String, Double>> topEntites = viewModel.getTopEntities(doc);
-            showAlert("The top entities are: \n" +
-                    topEntites.get(0).getKey() + " rank: " + topEntites.get(0).getValue() + " \n" +
-                    topEntites.get(1).getKey() + " rank: " + topEntites.get(1).getValue() + " \n" +
-                    topEntites.get(2).getKey() + " rank: " + topEntites.get(2).getValue() + " \n" +
-                    topEntites.get(3).getKey() + " rank: " + topEntites.get(3).getValue() + " \n" +
-                    topEntites.get(4).getKey() + " rank: " + topEntites.get(4).getValue() + " \n" );
+        try {
+            String doc = docsComboBox.getSelectionModel().getSelectedItem().toString();
+
+            if(doc!= null && doc!=""){
+                List<Pair<String, Double>> topEntites = viewModel.getTopEntities(doc, stem);
+                int numOfEntities = Math.min(5, topEntites.size());
+                String alert = "The top entities are: \n";
+                for (int i=0; i<numOfEntities; i++ ){
+                    alert = alert + topEntites.get(i).getKey() + " rank: " + topEntites.get(0).getValue() + " \n";
+                }
+                showAlert(alert );
+            }
         }
+        catch (NullPointerException e){
+            showAlert("please choose relevant document.");
+        }
+
 
 
     }

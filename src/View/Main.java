@@ -18,23 +18,6 @@ public class Main extends Application{
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         launch(args);
 
-/*
-        int docsNum = 0;
-        long totalTime = 0;
-        System.out.println("start");
-        long startTime 	= System.currentTimeMillis();
-
-        Model.ProcessManager pm = new Model.ProcessManager("C:\\Users\\Hilla Ben-Avi\\Desktop\\IRCORPUS","C:\\Users\\Hilla Ben-Avi\\Desktop\\IRINDEX",false);
-       // pm.loadDictionaryFromFile();
-
-        pm.manage();
-
-        long finishTime = System.currentTimeMillis();
-        totalTime = finishTime - startTime;
-
-        System.out.println("total time:" + totalTime);
-
-*/
     }
 
 
