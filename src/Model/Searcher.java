@@ -251,7 +251,7 @@ public class Searcher {
         toReturn.addAll(query);
         try {
             for (int i = 0; i < query.size(); i++) {
-                Word2VecModel model = Word2VecModel.fromTextFile(new File( "C:\\Users\\hillabe\\IdeaProjects\\SearchEngine\\word2vec.c.output.model.txt"));
+                Word2VecModel model = Word2VecModel.fromTextFile(new File( "word2vec.c.output.model.txt"));
                 com.medallia.word2vec.Searcher searcher = model.forSearch();
                 int num = 3;
                 try{
