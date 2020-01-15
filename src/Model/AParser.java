@@ -307,7 +307,7 @@ public abstract class AParser {
             return term;
         }
         if(term.contains("-")){
-            term = term + "Dollars";
+            term = term + " Dollars";
             return term;
         }
         double price = Double.parseDouble(term);

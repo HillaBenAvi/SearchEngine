@@ -94,6 +94,10 @@ public class Searcher {
                 Hashtable<String, Pair< Integer, Boolean >> termsWithNumOfAppearencesInEveryDoc = findRelevantDocsForTerm(term, true, stem);
                 listOfTerms.put(term, termsWithNumOfAppearencesInEveryDoc);
             }
+            if (dictionary.containsKey(term.toUpperCase())){
+                Hashtable<String, Pair< Integer, Boolean >> termsWithNumOfAppearencesInEveryDoc = findRelevantDocsForTerm(term.toUpperCase(), true, stem);
+                listOfTerms.put(term.toUpperCase(), termsWithNumOfAppearencesInEveryDoc);
+            }
 
         }
 
@@ -101,6 +105,10 @@ public class Searcher {
             if (dictionary.containsKey(term)){
                 Hashtable<String, Pair< Integer, Boolean >> termsWithNumOfAppearencesInEveryDoc = findRelevantDocsForTerm(term, false, stem);
                 listOfTerms.put(term, termsWithNumOfAppearencesInEveryDoc);
+            }
+            if (dictionary.containsKey(term.toUpperCase())){
+                Hashtable<String, Pair< Integer, Boolean >> termsWithNumOfAppearencesInEveryDoc = findRelevantDocsForTerm(term.toUpperCase(), false, stem);
+                listOfTerms.put(term.toUpperCase(), termsWithNumOfAppearencesInEveryDoc);
             }
 
         }
@@ -134,7 +142,6 @@ public class Searcher {
         }
 
         catch (Exception e){
-            e.printStackTrace();
         }
 
         return documents;

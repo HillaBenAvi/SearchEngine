@@ -410,6 +410,7 @@ public class SearchEngineController {
 
     public void fillQueryComboBox ( ArrayList<String> queries ){
         queryComboBox.getItems().clear();
+        docsComboBox.getItems().clear();
         for (String query : queries){
             queryComboBox.getItems().add(query);
         }
