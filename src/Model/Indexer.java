@@ -338,6 +338,7 @@ public class Indexer {
         FileReader fr = new FileReader(new File(filePath));
         BufferedReader br = new BufferedReader(fr);
         String line = br.readLine();
+        int lastIndex =-1;
         while (line != null){
             String [] splittedLine = line.split("=");
             Term term = new Term (splittedLine[0]);
@@ -346,6 +347,11 @@ public class Indexer {
             term.setLocationInPosting(Integer.parseInt(splittedLine[3]));
             dictionary.put(splittedLine[0], term);
             line = br.readLine();
+            if(Integer.parseInt(splittedLine[3])!= lastIndex +1 ){
+                System.out.println(splittedLine[0]);
+            }
+            lastIndex = Integer.parseInt(splittedLine[3]);
+
         }
         fr.close();
 
