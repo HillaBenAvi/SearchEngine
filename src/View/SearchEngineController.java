@@ -442,7 +442,7 @@ public class SearchEngineController {
                 int numOfEntities = Math.min(5, topEntites.size());
                 String alert = "The top entities are: \n";
                 for (int i=0; i<numOfEntities; i++ ){
-                    alert = alert + topEntites.get(i).getKey() + " rank: " + topEntites.get(0).getValue() + " \n";
+                    alert = alert + topEntites.get(i).getKey() + " rank: " + topEntites.get(i).getValue() + " \n";
                 }
                 showAlert(alert );
             }
