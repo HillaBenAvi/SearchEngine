@@ -5,6 +5,7 @@
       <element id="module-output" name="SearchEngine" />
       <element id="extracted-dir" path="$PROJECT_DIR$/common-lang3.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/medallia-word2vec-0.10.2-jar-with-dependencies.jar" path-in-jar="/" />
+      <element id="library" level="project" name="SearchEngine" />
     </root>
   </artifact>
 </component>
